@@ -7,14 +7,14 @@
 <meta name="description" content="FDA registration, Halal, ISO 9001, HACCP, Kosher certification, and independent lab purity analysis for Alexander's Himalayan pink salt.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=Instrument+Serif:ital@1&family=Work+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital@1&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <nav class="site-nav is-solid" id="siteNav">
   <a href="index.html" class="site-nav__brand">
-    <img src="assets/images/mascot-turnaround.jpeg" alt="Alexander's emblem">
+    <img src="assets/images/logo-badge-crop.jpeg" alt="Alexander's emblem">
     Alexander's
   </a>
   <div class="site-nav__links">
@@ -42,52 +42,75 @@
 <section class="products" style="padding-top:70px;">
   <div class="wrap">
     <!--
-      Each href points to assets/certifications/<file>.pdf. Upload
-      the real certificate PDFs to that folder with matching
-      filenames (or update the hrefs to wherever they live once
-      this is on Bluehost) and these buttons work with no other
-      changes.
+      Real security lives server-side: wordpress/cert-password-gate.php
+      is a WPCode snippet that checks the password and streams the PDF
+      bytes directly, the files are never at a guessable public URL.
+      data-cert-id below must match the $id keys in that PHP file.
+      Until that snippet is installed, "Unlock" fails gracefully with
+      a clear message, same pattern as the contact form.
     -->
     <div class="cert-page-grid">
-      <div class="cert-card">
+      <div class="cert-card reveal">
         <div class="cert-card__label">Food Safety</div>
         <h3>FDA Facility Registration</h3>
         <p>Registered for export into the United States under FDA food facility requirements.</p>
-        <a href="assets/certifications/fda-registration.pdf" class="btn" target="_blank" rel="noopener">Download PDF</a>
+        <button class="btn cert-unlock" data-cert-id="fda-registration" data-cert-name="FDA Facility Registration">&#128274; Unlock Certificate</button>
       </div>
-      <div class="cert-card">
+      <div class="cert-card reveal">
         <div class="cert-card__label">Dietary</div>
         <h3>Halal Certification</h3>
         <p>Certified Halal by an accredited certification body.</p>
-        <a href="assets/certifications/halal-certification.pdf" class="btn" target="_blank" rel="noopener">Download PDF</a>
+        <button class="btn cert-unlock" data-cert-id="halal-certification" data-cert-name="Halal Certification">&#128274; Unlock Certificate</button>
       </div>
-      <div class="cert-card">
+      <div class="cert-card reveal">
         <div class="cert-card__label">Quality Management</div>
         <h3>ISO 9001</h3>
         <p>Certified quality management system across sourcing, processing, and export.</p>
-        <a href="assets/certifications/iso-9001.pdf" class="btn" target="_blank" rel="noopener">Download PDF</a>
+        <button class="btn cert-unlock" data-cert-id="iso-9001" data-cert-name="ISO 9001">&#128274; Unlock Certificate</button>
       </div>
-      <div class="cert-card">
+      <div class="cert-card reveal">
         <div class="cert-card__label">Food Safety</div>
         <h3>HACCP Compliance</h3>
         <p>Hazard analysis and critical control points verified across the facility.</p>
-        <a href="assets/certifications/haccp.pdf" class="btn" target="_blank" rel="noopener">Download PDF</a>
+        <button class="btn cert-unlock" data-cert-id="haccp" data-cert-name="HACCP Compliance">&#128274; Unlock Certificate</button>
       </div>
-      <div class="cert-card">
+      <div class="cert-card reveal">
         <div class="cert-card__label">Dietary</div>
         <h3>Kosher Certification</h3>
         <p>Certified Kosher for retail and food manufacturing partners.</p>
-        <a href="assets/certifications/kosher-certification.pdf" class="btn" target="_blank" rel="noopener">Download PDF</a>
+        <button class="btn cert-unlock" data-cert-id="kosher-certification" data-cert-name="Kosher Certification">&#128274; Unlock Certificate</button>
       </div>
-      <div class="cert-card">
+      <div class="cert-card reveal">
         <div class="cert-card__label">Independent Verification</div>
         <h3>Third-Party Lab Analysis</h3>
         <p>Full mineral and purity breakdown from an independent laboratory.</p>
-        <a href="assets/certifications/lab-analysis.pdf" class="btn" target="_blank" rel="noopener">Download PDF</a>
+        <button class="btn cert-unlock" data-cert-id="lab-analysis" data-cert-name="Third-Party Lab Analysis">&#128274; Unlock Certificate</button>
       </div>
     </div>
   </div>
 </section>
+
+<div class="cert-modal" id="certModal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="cert-modal__backdrop" id="certModalBackdrop"></div>
+  <div class="cert-modal__panel">
+    <button class="cert-modal__close" id="certModalClose" aria-label="Close">&times;</button>
+
+    <div class="cert-modal__gate" id="certGate">
+      <div class="cert-modal__lock">&#128274;</div>
+      <h3 id="certGateTitle">Enter Password</h3>
+      <p>This certificate is restricted. Enter the password to view it.</p>
+      <form id="certGateForm">
+        <input type="password" id="certGatePassword" placeholder="Password" required autocomplete="current-password">
+        <button type="submit" class="btn btn--ember">Unlock</button>
+      </form>
+      <div class="form-status" id="certGateStatus"></div>
+    </div>
+
+    <div class="cert-modal__viewer" id="certViewer" hidden>
+      <iframe id="certPdfFrame" title="Certificate PDF"></iframe>
+    </div>
+  </div>
+</div>
 
 <section class="cta-band">
   <div class="wrap">

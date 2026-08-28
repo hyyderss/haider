@@ -5,43 +5,87 @@
     "fields": [
       {
         "key": "field_alex_nav_logo",
-        "label": "Nav Emblem",
+        "label": "Site Logo",
         "name": "nav_logo",
         "type": "image",
         "return_format": "url",
         "preview_size": "thumbnail",
         "library": "all",
-        "instructions": "The small round emblem in the top-left of the navigation bar."
+        "instructions": "The circular emblem shown in the nav bar and the discovery slide badge."
       },
       {
-        "key": "field_alex_hero_establish",
-        "label": "Hero Frame 1: Establishing Shot",
-        "name": "hero_frame_establish",
+        "key": "field_alex_journey_0",
+        "label": "Journey Slide 1: Opening",
+        "name": "journey_frame_0",
         "type": "image",
         "return_format": "url",
         "preview_size": "medium",
         "library": "all",
-        "instructions": "The opening shot, Alexander overlooking the Himalayas at dusk. Use the highest resolution version available, this fills the full screen."
+        "instructions": "Alexander overlooking the Himalayas, the opening shot before the journey begins."
       },
       {
-        "key": "field_alex_hero_conquest",
-        "label": "Hero Frame 2: Conquest Scene (Wide)",
-        "name": "hero_frame_conquest",
+        "key": "field_alex_journey_1",
+        "label": "Journey Slide 2: Macedon (334 BC)",
+        "name": "journey_frame_1",
+        "type": "image",
+        "return_format": "url",
+        "preview_size": "medium",
+        "library": "all"
+      },
+      {
+        "key": "field_alex_journey_2",
+        "label": "Journey Slide 3: Persia (331 BC)",
+        "name": "journey_frame_2",
+        "type": "image",
+        "return_format": "url",
+        "preview_size": "medium",
+        "library": "all"
+      },
+      {
+        "key": "field_alex_journey_3",
+        "label": "Journey Slide 4: The March East (aerial)",
+        "name": "journey_frame_3",
+        "type": "image",
+        "return_format": "url",
+        "preview_size": "medium",
+        "library": "all"
+      },
+      {
+        "key": "field_alex_journey_4",
+        "label": "Journey Slide 5: Bactria (329 BC)",
+        "name": "journey_frame_4",
+        "type": "image",
+        "return_format": "url",
+        "preview_size": "medium",
+        "library": "all"
+      },
+      {
+        "key": "field_alex_journey_5",
+        "label": "Journey Slide 6: The Himalayas Appear",
+        "name": "journey_frame_5",
+        "type": "image",
+        "return_format": "url",
+        "preview_size": "medium",
+        "library": "all"
+      },
+      {
+        "key": "field_alex_journey_6",
+        "label": "Journey Slide 7: Khewra Approach",
+        "name": "journey_frame_6",
+        "type": "image",
+        "return_format": "url",
+        "preview_size": "medium",
+        "library": "all"
+      },
+      {
+        "key": "field_alex_journey_7",
+        "label": "Journey Slide 8: The Discovery",
+        "name": "journey_frame_7",
         "type": "image",
         "return_format": "url",
         "preview_size": "medium",
         "library": "all",
-        "instructions": "The wide battle charge scene, pans left to right. Replace with an extracted AI video frame later if you move to the full motion version."
-      },
-      {
-        "key": "field_alex_hero_conquest_close",
-        "label": "Hero Frame 3: Conquest Scene (Close)",
-        "name": "hero_frame_conquest_close",
-        "type": "image",
-        "return_format": "url",
-        "preview_size": "medium",
-        "library": "all",
-        "instructions": "A tighter shot on Alexander mid-charge, pans top to bottom. Currently a crop of Frame 2, replace with its own distinct image once you have one."
+        "instructions": "The final crystal reveal, the moment the salt is discovered."
       }
     ],
     "location": [
@@ -59,6 +103,6 @@
     "label_placement": "top",
     "instruction_placement": "label",
     "active": true,
-    "description": "Editable hero imagery for the Alexander's homepage cinematic section."
+    "description": "Editable imagery for all 8 slides of the homepage journey, plus the site logo. Swap any of these in wp-admin for a high-quality or AI-generated replacement, no code changes needed."
   }
 ]

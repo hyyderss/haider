@@ -9,7 +9,7 @@
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=Instrument+Serif:ital@1&family=Work+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital@1&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="css/style.css">
 </head>
@@ -20,7 +20,7 @@
      ============================================================ -->
 <nav class="site-nav" id="siteNav">
   <a href="#top" class="site-nav__brand">
-    <img src="assets/images/mascot-turnaround.jpeg" alt="Alexander's emblem">
+    <img src="assets/images/logo-badge-crop.jpeg" alt="Alexander's emblem">
     Alexander's
   </a>
   <div class="site-nav__links">
@@ -38,92 +38,124 @@
 </nav>
 
 <!-- ============================================================
-     CINEMATIC SCROLL-SCRUB HERO
-     data-acf hooks mark the text a future ACF field group should
-     expose in wp-admin, wire these once the WordPress side is set up.
+     THE JOURNEY — a map-slide sequence, not a video scrub.
+     Each .journey__slide is one location. Scrolling (wheel, touch,
+     or arrow keys) advances one slide at a time; a marker dot
+     travels along a drawn route line from the previous location's
+     mark to the next while the background crossfades underneath.
+     data-acf hooks mark text a future ACF field group should
+     expose in wp-admin, wire these once WordPress is set up.
      ============================================================ -->
 <a id="top"></a>
-<section class="cinema" id="cinema" aria-label="Alexander's origin story, scroll to progress">
+<section class="journey" id="journey" aria-label="Alexander's origin story, scroll to advance">
+  <div class="journey__stage">
 
-  <div class="cinema__stage">
+    <canvas id="crystalCanvas" class="journey__canvas" aria-hidden="true"></canvas>
 
-    <div class="cinema__edge cinema__edge--left" id="edgeLeft"></div>
-    <div class="cinema__edge cinema__edge--right" id="edgeRight"></div>
-
-    <!-- beat 1: establishing shot, slow zoom-in -->
-    <div class="cinema__frame" id="frameEstablish" style="opacity:1;">
-      <img src="assets/images/hero-establishing.jpeg" alt="Alexander on horseback overlooking the Himalayan mountain range at dusk">
-    </div>
-
-    <!-- beat 2: conquest, wide, pans left to right with the charge -->
-    <div class="cinema__frame" id="frameConquestWide">
-      <img src="assets/images/hero-conquest.jpeg" alt="Alexander charging through a conquered fortress gate">
-    </div>
-
-    <!-- beat 3: conquest, tight on Alexander, pans top to bottom -->
-    <div class="cinema__frame" id="frameConquestClose">
-      <img src="assets/images/hero-conquest-closeup.jpeg" alt="Close on Alexander raising his sword mid-charge">
-    </div>
-
-    <!-- beat 4: return to the Himalayas, warm graded, pans bottom to top -->
-    <div class="cinema__frame" id="frameReturn">
-      <img src="assets/images/hero-establishing.jpeg" alt="Returning to the Himalayan ridge at dusk">
-    </div>
-
-    <div class="cinema__scrim"></div>
-    <div class="cinema__colorgrade" id="colorgrade"></div>
-
-    <!-- opening headline, fades out as scrub begins -->
-    <div class="cinema__intro" id="cinemaIntro">
-      <div class="text-plate">
-        <span class="eyebrow" data-acf="hero_eyebrow">326 BC &middot; KHEWRA, THE HIMALAYAS</span>
+    <div class="journey__slide is-active" data-index="0" data-mx="50" data-my="86">
+      <div class="journey__bg"><img src="assets/images/journey/00-opening.jpeg" alt="Alexander on horseback overlooking the Himalayan mountain range at dusk"></div>
+      <div class="journey__overlay"></div>
+      <div class="journey__text text-plate" style="left:50%; bottom:16%; transform:translateX(-50%); text-align:center;">
+        <span class="eyebrow" data-acf="hero_eyebrow">326 BC &middot; THE HIMALAYAS</span>
         <h1 data-acf="hero_headline">The Salt That <span class="accent">Conquered</span> Time</h1>
-        <p data-acf="hero_subcopy">A warhorse once knelt on this ridge and licked a rock that glowed pink beneath the dusk. Two thousand years later, we are still its guardians.</p>
+        <p data-acf="hero_subcopy">A warhorse once knelt on a ridge like this one and licked a rock that glowed pink beneath the dusk. This is that campaign.</p>
       </div>
     </div>
 
-    <div class="cinema__scrollcue" id="scrollCue">
+    <div class="journey__slide" data-index="1" data-mx="20" data-my="62">
+      <div class="journey__bg"><img src="assets/images/journey/01-macedon.jpeg" alt="Alexander overlooking Macedon and the Acropolis at dusk"></div>
+      <div class="journey__overlay"></div>
+      <div class="journey__text text-plate" style="left:8%; top:58%;">
+        <span class="eyebrow">334 BC</span>
+        <h2>Macedon</h2>
+        <p>The campaign begins. The army marches east from the Macedonian court.</p>
+      </div>
+    </div>
+
+    <div class="journey__slide" data-index="2" data-mx="78" data-my="34">
+      <div class="journey__bg"><img src="assets/images/journey/02-persia.jpeg" alt="Alexander commanding his army toward the Persian sunrise"></div>
+      <div class="journey__overlay"></div>
+      <div class="journey__text text-plate" style="right:8%; top:16%; text-align:right;">
+        <span class="eyebrow">331 BC</span>
+        <h2>Persia</h2>
+        <p>The Achaemenid Empire falls. The known world's borders are redrawn.</p>
+      </div>
+    </div>
+
+    <div class="journey__slide" data-index="3" data-mx="50" data-my="50">
+      <div class="journey__bg"><img src="assets/images/journey/03-march-aerial.jpeg" alt="Aerial view of the army marching east across the desert"></div>
+      <div class="journey__overlay"></div>
+      <div class="journey__text text-plate" style="left:50%; top:12%; transform:translateX(-50%); text-align:center;">
+        <span class="eyebrow">THE MARCH EAST</span>
+        <h2>Ten Thousand Strong</h2>
+        <p>The campaign turns toward the mountains, an empire's army moving as one.</p>
+      </div>
+    </div>
+
+    <div class="journey__slide" data-index="4" data-mx="24" data-my="70">
+      <div class="journey__bg"><img src="assets/images/journey/04-bactria.jpeg" alt="Alexander charging through a conquered fortress gate at the Bactrian frontier"></div>
+      <div class="journey__overlay"></div>
+      <div class="journey__text text-plate" style="left:6%; bottom:10%;">
+        <span class="eyebrow">329 BC</span>
+        <h2>Bactria</h2>
+        <p>The eastern frontier holds through a punishing campaign.</p>
+      </div>
+    </div>
+
+    <div class="journey__slide" data-index="5" data-mx="72" data-my="38">
+      <div class="journey__bg"><img src="assets/images/journey/05-himalayas-appear.jpeg" alt="The Himalayas rise ahead as Alexander approaches on horseback"></div>
+      <div class="journey__overlay"></div>
+      <div class="journey__text text-plate" style="right:8%; top:14%; text-align:right;">
+        <span class="eyebrow">326 BC</span>
+        <h2>The Himalayas Appear</h2>
+        <p>Ahead, foothills rise from the dust for the first time.</p>
+      </div>
+    </div>
+
+    <div class="journey__slide" data-index="6" data-mx="46" data-my="58">
+      <div class="journey__bg"><img src="assets/images/journey/06-khewra-approach.jpeg" alt="A caravan approaches a massive glowing pink salt formation at Khewra"></div>
+      <div class="journey__overlay journey__overlay--warm"></div>
+      <div class="journey__text text-plate" style="left:50%; bottom:12%; transform:translateX(-50%); text-align:center;">
+        <span class="eyebrow">KHEWRA</span>
+        <h2>The Reserve</h2>
+        <p>A formation unlike anything seen before, waiting beneath the dust.</p>
+      </div>
+    </div>
+
+    <div class="journey__slide" data-index="7" data-mx="50" data-my="50">
+      <div class="journey__bg"><img src="assets/images/journey/07-discovery-crystal.jpeg" alt="A glowing burst of pink salt crystal, the moment of discovery"></div>
+      <div class="journey__overlay journey__overlay--discovery"></div>
+      <div class="journey__text text-plate" style="left:50%; top:50%; transform:translate(-50%,-50%); text-align:center;">
+        <div class="badge">
+          <img src="assets/images/logo-badge-crop.jpeg" alt="Alexander's emblem">
+          <span>Guardian Since 326 BC</span>
+        </div>
+        <span class="eyebrow" data-acf="discovery_eyebrow">THE DISCOVERY</span>
+        <h2 data-acf="discovery_headline">Purity, Found</h2>
+        <p data-acf="discovery_subcopy">A horse knelt to drink and licked the stone beneath it. Alexander's has guarded this reserve ever since.</p>
+      </div>
+    </div>
+
+    <svg class="journey__route" id="journeyRoute" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <path id="routePath" fill="none" stroke="var(--bronze)" stroke-width="0.3" stroke-linecap="round"></path>
+    </svg>
+    <div class="journey__marker" id="journeyMarker">&#9673;</div>
+
+    <div class="journey__progress" id="journeyDots"></div>
+    <button class="journey__arrow journey__arrow--up" id="journeyPrev" aria-label="Previous location">&#8593;</button>
+    <button class="journey__arrow journey__arrow--down" id="journeyNext" aria-label="Next location">&#8595;</button>
+
+    <div class="journey__scrollcue" id="scrollCue">
       <span>Scroll to begin the campaign</span>
       <span class="line"></span>
     </div>
-
-    <!-- region callouts, fired by scroll progress -->
-    <div class="cinema__callouts">
-      <div class="callout callout--macedon" id="calloutMacedon">
-        <div class="callout__year">334 BC</div>
-        <div class="callout__place">Macedon</div>
-        <div class="callout__desc">The campaign begins. The army marches east from the Macedonian court.</div>
-      </div>
-      <div class="callout callout--persia" id="calloutPersia">
-        <div class="callout__year">331 BC</div>
-        <div class="callout__place">Persia</div>
-        <div class="callout__desc">The Achaemenid Empire falls. The known world's borders are redrawn.</div>
-      </div>
-      <div class="callout callout--bactria" id="calloutBactria">
-        <div class="callout__year">329 BC</div>
-        <div class="callout__place">Bactria</div>
-        <div class="callout__desc">The eastern frontier holds. The mountains of the Himalayas come into view.</div>
-      </div>
-    </div>
-
-    <!-- final discovery reveal -->
-    <div class="cinema__discovery" id="cinemaDiscovery">
-      <div class="badge">
-        <img src="assets/images/mascot-front-crop.jpeg" alt="Alexander's emblem">
-        <span>Guardian Since 326 BC</span>
-      </div>
-      <span class="eyebrow" data-acf="discovery_eyebrow">326 BC &middot; KHEWRA</span>
-      <h2 data-acf="discovery_headline">The Discovery</h2>
-      <p data-acf="discovery_subcopy">A horse knelt to drink, licked the stone beneath it, and revealed a reserve of pink salt formed over millions of years. Alexander's has been its guardian ever since.</p>
-    </div>
-
   </div>
 </section>
 
 <noscript>
   <div style="padding:120px 20px; text-align:center; background:#120c1a;">
     <p style="font-family:'Space Mono',monospace; letter-spacing:0.15em; text-transform:uppercase; color:#c9a15a; font-size:12px;">326 BC &middot; Khewra, The Himalayas</p>
-    <h1 style="font-family:'Unbounded',sans-serif; text-transform:uppercase; color:#f3ead9; font-size:36px; margin-top:16px;">The Salt That Conquered Time</h1>
+    <h1 style="font-family:'Cinzel',serif; text-transform:uppercase; color:#f3ead9; font-size:36px; margin-top:16px;">The Salt That Conquered Time</h1>
   </div>
 </noscript>
 
@@ -162,22 +194,22 @@
       <p>Most commercial salt is blasted with explosives, bleached, then cut with anti-caking agents. We do not. Every crystal that leaves Khewra passes through four stages, and not one of them touches a chemical.</p>
     </div>
     <div class="process__grid">
-      <div class="process__step">
+      <div class="process__step reveal">
         <div class="num">01</div>
         <h3>Ethical Extraction</h3>
         <p>Hand-mined by skilled workers at fair wages, no explosives, no mechanized blasting.</p>
       </div>
-      <div class="process__step">
+      <div class="process__step reveal">
         <div class="num">02</div>
         <h3>The Purification Wash</h3>
         <p>Rinsed in natural spring water to clear surface sediment before any processing begins.</p>
       </div>
-      <div class="process__step">
+      <div class="process__step reveal">
         <div class="num">03</div>
         <h3>Precision Crafting</h3>
         <p>Ground to exact specification, from micro-fine powder to coarse culinary crystals.</p>
       </div>
-      <div class="process__step">
+      <div class="process__step reveal">
         <div class="num">04</div>
         <h3>The Purity Seal</h3>
         <p>Optical color sorting, metal detection, then a hermetic seal before it ever leaves the facility.</p>
@@ -199,14 +231,14 @@
       <a href="contact.html" class="btn">Request A Quote</a>
     </div>
     <div class="products__grid">
-      <div class="product-card"><div class="product-card__tag">Culinary</div><h3>Fine Grain Salt</h3></div>
-      <div class="product-card"><div class="product-card__tag">Culinary</div><h3>Coarse Grain Salt</h3></div>
-      <div class="product-card"><div class="product-card__tag">Culinary</div><h3>Cooking Bricks</h3></div>
-      <div class="product-card"><div class="product-card__tag">Decor</div><h3>Crafted Lamps</h3></div>
-      <div class="product-card"><div class="product-card__tag">Decor</div><h3>Natural Lamps</h3></div>
-      <div class="product-card"><div class="product-card__tag">Wellness</div><h3>Bath Salt / Detox</h3></div>
-      <div class="product-card"><div class="product-card__tag">Agriculture</div><h3>Animal Licks</h3></div>
-      <div class="product-card"><div class="product-card__tag">Export</div><h3>Wholesale Bulk</h3></div>
+      <div class="product-card reveal"><div class="product-card__tag">Culinary</div><h3>Fine Grain Salt</h3></div>
+      <div class="product-card reveal"><div class="product-card__tag">Culinary</div><h3>Coarse Grain Salt</h3></div>
+      <div class="product-card reveal"><div class="product-card__tag">Culinary</div><h3>Cooking Bricks</h3></div>
+      <div class="product-card reveal"><div class="product-card__tag">Decor</div><h3>Crafted Lamps</h3></div>
+      <div class="product-card reveal"><div class="product-card__tag">Decor</div><h3>Natural Lamps</h3></div>
+      <div class="product-card reveal"><div class="product-card__tag">Wellness</div><h3>Bath Salt / Detox</h3></div>
+      <div class="product-card reveal"><div class="product-card__tag">Agriculture</div><h3>Animal Licks</h3></div>
+      <div class="product-card reveal"><div class="product-card__tag">Export</div><h3>Wholesale Bulk</h3></div>
     </div>
   </div>
 </section>
@@ -277,6 +309,7 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script src="js/script.js"></script>
 </body>
 </html>

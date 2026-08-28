@@ -1,11 +1,11 @@
 /* ============================================================
-   ALEXANDER'S — scroll-scrub cinema engine
-   Vanilla JS, no dependencies. Maps scroll position inside the
-   .cinema section to a "frame" of the story, exactly like
-   scrubbing a video timeline. Swap the two placeholder frames
-   (hero-establishing.jpeg / hero-conquest.jpeg) for extracted
-   AI-video frame sequences later, the driver logic below does
-   not need to change, only the frame count and easing windows.
+   ALEXANDER'S — the journey (map-slide sequence)
+   Vanilla JS, no dependencies except an optional Three.js CDN
+   script for the ambient floating-crystal layer (skipped
+   gracefully if that script isn't loaded). Wheel, touch, and
+   arrow keys advance one full-bleed location slide at a time;
+   a marker travels along a drawn route line between each pair
+   of locations while the background crossfades underneath.
    ============================================================ */
 
 (function () {
@@ -14,157 +14,231 @@
 
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  var cinema = document.getElementById('cinema');
-  var colorgrade = document.getElementById('colorgrade');
-  var intro = document.getElementById('cinemaIntro');
+  var journey = document.getElementById('journey');
+  if (!journey) return;
+
+  var slides = Array.prototype.slice.call(journey.querySelectorAll('.journey__slide'));
+  var routePath = document.getElementById('routePath');
+  var marker = document.getElementById('journeyMarker');
+  var dotsWrap = document.getElementById('journeyDots');
+  var prevBtn = document.getElementById('journeyPrev');
+  var nextBtn = document.getElementById('journeyNext');
   var scrollCue = document.getElementById('scrollCue');
-  var discovery = document.getElementById('cinemaDiscovery');
-  var edgeLeft = document.getElementById('edgeLeft');
-  var edgeRight = document.getElementById('edgeRight');
   var nav = document.getElementById('siteNav');
 
-  if (!cinema) return;
+  var current = 0;
+  var animating = false;
+  var TRANSITION_MS = 900;
 
-  function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+  // build progress dots
+  slides.forEach(function (s, i) {
+    var d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' is-active' : '');
+    dotsWrap.appendChild(d);
+  });
+  var dots = Array.prototype.slice.call(dotsWrap.children);
 
-  // remaps progress from [a,b] into [0,1], clamped
-  function band(progress, a, b) {
-    if (progress <= a) return 0;
-    if (progress >= b) return 1;
-    return (progress - a) / (b - a);
+  function markerPos(index) {
+    var s = slides[index];
+    return { x: parseFloat(s.getAttribute('data-mx')), y: parseFloat(s.getAttribute('data-my')) };
   }
+
+  function setMarker(x, y) {
+    marker.style.left = x + '%';
+    marker.style.top = y + '%';
+  }
+  setMarker(markerPos(0).x, markerPos(0).y);
+
+  function updateChrome() {
+    dots.forEach(function (d, i) { d.classList.toggle('is-active', i === current); });
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === slides.length - 1;
+    scrollCue.style.opacity = current === 0 ? 1 : 0;
+    if (nav) nav.classList.toggle('is-solid', current > 0);
+  }
+  updateChrome();
+
+  function animateRoute(from, to, duration) {
+    if (reducedMotion) { setMarker(to.x, to.y); return; }
+    var midX = (from.x + to.x) / 2;
+    var midY = (from.y + to.y) / 2;
+    // bow the control point perpendicular to the travel direction for a gentle arc
+    var dx = to.x - from.x, dy = to.y - from.y;
+    var bow = Math.min(14, Math.hypot(dx, dy) * 0.3);
+    var cx = midX - dy * (bow / (Math.hypot(dx, dy) || 1));
+    var cy = midY + dx * (bow / (Math.hypot(dx, dy) || 1));
+
+    routePath.setAttribute('d', 'M ' + from.x + ',' + from.y + ' Q ' + cx + ',' + cy + ' ' + to.x + ',' + to.y);
+    var len = routePath.getTotalLength();
+    routePath.style.strokeDasharray = len;
+    routePath.style.strokeDashoffset = len;
+
+    var start = null;
+    function frame(ts) {
+      if (!start) start = ts;
+      var t = Math.min(1, (ts - start) / duration);
+      var eased = 1 - Math.pow(1 - t, 3);
+      routePath.style.strokeDashoffset = len * (1 - eased);
+      var point = routePath.getPointAtLength(len * eased);
+      setMarker(point.x, point.y);
+      if (t < 1) requestAnimationFrame(frame);
+      else {
+        setTimeout(function () { routePath.style.strokeDasharray = '1'; routePath.style.strokeDashoffset = '1'; }, 400);
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function goTo(index) {
+    index = Math.max(0, Math.min(slides.length - 1, index));
+    if (index === current || animating) return;
+    animating = true;
+
+    var from = markerPos(current);
+    var to = markerPos(index);
+
+    slides[current].classList.remove('is-active');
+    slides[index].classList.add('is-active');
+
+    animateRoute(from, to, TRANSITION_MS);
+
+    current = index;
+    updateChrome();
+
+    setTimeout(function () { animating = false; }, TRANSITION_MS + 50);
+  }
+
+  prevBtn.addEventListener('click', function () { goTo(current - 1); });
+  nextBtn.addEventListener('click', function () { goTo(current + 1); });
+
+  function isPinned() {
+    var rect = journey.getBoundingClientRect();
+    return Math.abs(rect.top) < 3;
+  }
+
+  window.addEventListener('wheel', function (e) {
+    if (!isPinned()) return;
+    var goingDown = e.deltaY > 0;
+    if (goingDown && current < slides.length - 1) { e.preventDefault(); goTo(current + 1); }
+    else if (!goingDown && current > 0) { e.preventDefault(); goTo(current - 1); }
+    // else: at a boundary, let the browser scroll the page normally
+  }, { passive: false });
+
+  var touchStartY = null;
+  window.addEventListener('touchstart', function (e) {
+    if (!isPinned()) { touchStartY = null; return; }
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  window.addEventListener('touchend', function (e) {
+    if (touchStartY === null) return;
+    var delta = touchStartY - e.changedTouches[0].clientY;
+    if (Math.abs(delta) < 40) return;
+    if (delta > 0 && current < slides.length - 1) goTo(current + 1);
+    else if (delta < 0 && current > 0) goTo(current - 1);
+    touchStartY = null;
+  }, { passive: true });
+
+  window.addEventListener('keydown', function (e) {
+    if (!isPinned()) return;
+    if (e.key === 'ArrowDown' || e.key === 'PageDown') { goTo(current + 1); }
+    else if (e.key === 'ArrowUp' || e.key === 'PageUp') { goTo(current - 1); }
+  });
 
   /* ----------------------------------------------------------
-     Frame sequence. Each entry is one visual beat, on screen
-     between "in" and "out", crossfading at the edges. "pan"
-     is the direction its Ken Burns drift travels while it is
-     the dominant frame, so consecutive beats don't all move
-     the same way. To add a real 5th/6th/7th beat later once
-     the AI-generated frames exist: add another <div class=
-     "cinema__frame"> in index.html with its own id, add one
-     row here, nothing else in this engine changes.
+     Ambient floating salt crystals, real WebGL via Three.js
+     (loaded from a CDN script tag before this file). Simple
+     low-poly geometry for now, deliberately not photoreal,
+     upgrade the geometry/material later without touching the
+     slide logic above.
      ---------------------------------------------------------- */
-  var frames = [
-    { el: document.getElementById('frameEstablish'), in: 0.00, out: 0.22, pan: 'zoom-in' },
-    { el: document.getElementById('frameConquestWide'), in: 0.20, out: 0.40, pan: 'left-right' },
-    { el: document.getElementById('frameConquestClose'), in: 0.38, out: 0.60, pan: 'top-bottom' },
-    { el: document.getElementById('frameReturn'), in: 0.58, out: 1.00, pan: 'bottom-top-out' }
-  ].filter(function (f) { return f.el; });
+  function initCrystals() {
+    if (typeof THREE === 'undefined' || reducedMotion) return;
+    var canvas = document.getElementById('crystalCanvas');
+    if (!canvas) return;
 
-  var callouts = {
-    macedon: { el: document.getElementById('calloutMacedon'), inAt: 0.22, outAt: 0.34 },
-    persia: { el: document.getElementById('calloutPersia'), inAt: 0.34, outAt: 0.46 },
-    bactria: { el: document.getElementById('calloutBactria'), inAt: 0.46, outAt: 0.58 }
-  };
+    var renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-  var mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+    camera.position.set(0, 0, 12);
 
-  function getProgress() {
-    var rect = cinema.getBoundingClientRect();
-    var total = cinema.offsetHeight - window.innerHeight;
-    if (total <= 0) return 0;
-    var scrolled = -rect.top;
-    return clamp(scrolled / total, 0, 1);
-  }
+    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+    var key = new THREE.DirectionalLight(0xf3ead9, 1.1);
+    key.position.set(4, 6, 8);
+    scene.add(key);
+    var rim = new THREE.DirectionalLight(0xe8a68e, 0.8);
+    rim.position.set(-6, -2, -4);
+    scene.add(rim);
 
-  function setCalloutState(c, p) {
-    var inRamp = band(p, c.inAt, c.inAt + 0.035);
-    var outRamp = 1 - band(p, c.outAt - 0.035, c.outAt);
-    var visibility = Math.min(inRamp, outRamp);
-    c.el.style.opacity = visibility;
-    c.el.style.transform = 'translateY(' + (24 - 24 * visibility) + 'px) scale(' + (0.96 + 0.04 * visibility) + ')';
-  }
-
-  function applyPan(img, pan, t) {
-    if (reducedMotion) return;
-    var tx = 0, ty = 0, scale = 1.05;
-    if (pan === 'zoom-in') { scale = 1.02 + t * 0.10; }
-    else if (pan === 'left-right') { tx = -3 + t * 6; scale = 1.06; }
-    else if (pan === 'top-bottom') { ty = -3 + t * 6; scale = 1.10; }
-    else if (pan === 'bottom-top-out') { ty = 3 - t * 6; scale = 1.10 - t * 0.08; }
-    img.style.transform = 'translate(' + tx + '%, ' + ty + '%) scale(' + scale + ')';
-  }
-
-  function update() {
-    var p = getProgress();
-
-    // nav solidifies once we scroll past the very top
-    if (window.scrollY > 40) nav.classList.add('is-solid');
-    else nav.classList.remove('is-solid');
-
-    // intro copy and scroll cue fade out quickly
-    var introVisible = 1 - band(p, 0.015, 0.09);
-    intro.style.opacity = introVisible;
-    intro.style.transform = 'translateY(' + (1 - introVisible) * -20 + 'px)';
-    scrollCue.style.opacity = 1 - band(p, 0.01, 0.06);
-
-    // crossfade + independent pan for every frame in the sequence
-    frames.forEach(function (f) {
-      var fadeIn = band(p, f.in, f.in + 0.05);
-      var fadeOut = 1 - band(p, f.out - 0.05, f.out);
-      var opacity = f.out >= 0.999 ? fadeIn : Math.min(fadeIn, fadeOut);
-      f.el.style.opacity = clamp(opacity, 0, 1);
-
-      var t = band(p, f.in, f.out);
-      applyPan(f.el.querySelector('img'), f.pan, t);
+    var material = new THREE.MeshStandardMaterial({
+      color: 0xe8a68e, roughness: 0.25, metalness: 0.1,
+      transparent: true, opacity: 0.85
     });
 
-    // warm color grade rises as the journey returns to Khewra
-    colorgrade.style.opacity = band(p, 0.64, 0.88) * 0.9;
-
-    // region callouts
-    setCalloutState(callouts.macedon, p);
-    setCalloutState(callouts.persia, p);
-    setCalloutState(callouts.bactria, p);
-
-    // final discovery reveal
-    var discoveryVisible = band(p, 0.90, 1.0);
-    discovery.style.opacity = discoveryVisible;
-    discovery.style.pointerEvents = discoveryVisible > 0.5 ? 'auto' : 'none';
-
-    // decorative side edges drift slowly with scroll for depth
-    var edgeShift = (p * 120).toFixed(1) + 'px';
-    edgeLeft.style.backgroundPosition = '0 -' + edgeShift;
-    edgeRight.style.backgroundPosition = '0 ' + edgeShift;
-  }
-
-  var ticking = false;
-  function onScroll() {
-    if (!ticking) {
-      window.requestAnimationFrame(function () {
-        update();
-        ticking = false;
-      });
-      ticking = true;
-    }
-  }
-
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', onScroll);
-
-  // mouse-driven parallax on the active frame, skipped for reduced motion
-  if (!reducedMotion) {
-    document.addEventListener('mousemove', function (e) {
-      targetX = (e.clientX / window.innerWidth - 0.5) * 2;
-      targetY = (e.clientY / window.innerHeight - 0.5) * 2;
+    var crystals = [];
+    var layout = [
+      { x: -6.5, y: 2.4, z: 0, s: 0.9 },
+      { x: 6.8, y: -1.5, z: -1, s: 1.2 },
+      { x: -5.8, y: -3.2, z: 1, s: 0.7 },
+      { x: 6.2, y: 3.0, z: 0.5, s: 0.6 }
+    ];
+    layout.forEach(function (p) {
+      var geo = new THREE.OctahedronGeometry(p.s, 0);
+      var mesh = new THREE.Mesh(geo, material);
+      mesh.position.set(p.x, p.y, p.z);
+      mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+      scene.add(mesh);
+      crystals.push({ mesh: mesh, baseY: p.y, speed: 0.3 + Math.random() * 0.3, phase: Math.random() * Math.PI * 2 });
     });
 
-    function parallaxLoop() {
-      mouseX += (targetX - mouseX) * 0.05;
-      mouseY += (targetY - mouseY) * 0.05;
-      var shiftX = mouseX * 14;
-      var shiftY = mouseY * 10;
-      frames.forEach(function (f) {
-        f.el.querySelector('img').style.marginLeft = shiftX + 'px';
-        f.el.querySelector('img').style.marginTop = shiftY + 'px';
-      });
-      requestAnimationFrame(parallaxLoop);
+    function resize() {
+      var w = canvas.clientWidth, h = canvas.clientHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
     }
-    parallaxLoop();
-  }
+    window.addEventListener('resize', resize);
+    resize();
 
-  update();
+    var clock = new THREE.Clock();
+    function tick() {
+      var t = clock.getElapsedTime();
+      crystals.forEach(function (c) {
+        c.mesh.position.y = c.baseY + Math.sin(t * c.speed + c.phase) * 0.4;
+        c.mesh.rotation.x += 0.002;
+        c.mesh.rotation.y += 0.003;
+      });
+      renderer.render(scene, camera);
+      requestAnimationFrame(tick);
+    }
+    tick();
+  }
+  initCrystals();
+
 })();
+
+/* ============================================================
+   SCROLL-REVEAL, used site-wide on inner pages
+   ============================================================ */
+(function () {
+  var targets = document.querySelectorAll('.reveal');
+  if (!targets.length) return;
+  if (typeof IntersectionObserver === 'undefined') {
+    targets.forEach(function (t) { t.classList.add('is-visible'); });
+    return;
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  targets.forEach(function (t) { io.observe(t); });
+})();
+
 
 /* ============================================================
    PRODUCT FILTER (products.html and the homepage grid, both use
@@ -229,6 +303,92 @@
         );
         status.innerHTML = 'The contact form isn\'t connected yet. <a href="mailto:support@alexandersalts.com?subject=' + subject + '&body=' + body + '" style="color:var(--salt-pink);text-decoration:underline;">Click here to send this by email instead</a>.';
         status.className = 'form-status is-error';
+      });
+  });
+})();
+
+/* ============================================================
+   CERTIFICATE PASSWORD GATE (certifications.html)
+   Posts to admin-post.php, handled by
+   wordpress/cert-password-gate.php, which checks the password
+   server-side and streams the PDF bytes back directly (the
+   files are never at a public, guessable URL). Fails gracefully
+   to a status message if that endpoint isn't installed yet.
+   ============================================================ */
+(function () {
+  var modal = document.getElementById('certModal');
+  if (!modal) return;
+
+  var backdrop = document.getElementById('certModalBackdrop');
+  var closeBtn = document.getElementById('certModalClose');
+  var gate = document.getElementById('certGate');
+  var gateTitle = document.getElementById('certGateTitle');
+  var gateForm = document.getElementById('certGateForm');
+  var gatePassword = document.getElementById('certGatePassword');
+  var gateStatus = document.getElementById('certGateStatus');
+  var viewer = document.getElementById('certViewer');
+  var pdfFrame = document.getElementById('certPdfFrame');
+
+  var currentCertId = null;
+
+  function openModal(certId, certName) {
+    currentCertId = certId;
+    gateTitle.textContent = 'Enter Password: ' + certName;
+    gateStatus.textContent = '';
+    gateStatus.className = 'form-status';
+    gatePassword.value = '';
+    gate.hidden = false;
+    viewer.hidden = true;
+    pdfFrame.src = 'about:blank';
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    setTimeout(function () { gatePassword.focus(); }, 50);
+  }
+
+  function closeModal() {
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    pdfFrame.src = 'about:blank';
+  }
+
+  document.querySelectorAll('.cert-unlock').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      openModal(btn.getAttribute('data-cert-id'), btn.getAttribute('data-cert-name'));
+    });
+  });
+  closeBtn.addEventListener('click', closeModal);
+  backdrop.addEventListener('click', closeModal);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+
+  gateForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    gateStatus.textContent = 'Checking...';
+    gateStatus.className = 'form-status';
+
+    var data = new FormData();
+    data.append('action', 'alexanders_cert_auth');
+    data.append('cert_id', currentCertId);
+    data.append('password', gatePassword.value);
+
+    fetch('/wp-admin/admin-post.php', { method: 'POST', body: data })
+      .then(function (res) {
+        if (res.status === 403) { throw new Error('WRONG_PASSWORD'); }
+        if (!res.ok) { throw new Error('NOT_CONNECTED'); }
+        return res.blob();
+      })
+      .then(function (blob) {
+        var url = URL.createObjectURL(blob);
+        pdfFrame.src = url;
+        gate.hidden = true;
+        viewer.hidden = false;
+      })
+      .catch(function (err) {
+        if (err.message === 'WRONG_PASSWORD') {
+          gateStatus.textContent = 'Incorrect password, try again.';
+        } else {
+          gateStatus.textContent = 'This password gate isn\'t connected yet, install wordpress/cert-password-gate.php first.';
+        }
+        gateStatus.className = 'form-status is-error';
       });
   });
 })();
