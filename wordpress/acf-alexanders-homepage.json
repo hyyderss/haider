@@ -1,0 +1,54 @@
+[
+  {
+    "key": "group_alexanders_homepage_media",
+    "title": "Homepage Media",
+    "fields": [
+      {
+        "key": "field_alex_nav_logo",
+        "label": "Nav Emblem",
+        "name": "nav_logo",
+        "type": "image",
+        "return_format": "url",
+        "preview_size": "thumbnail",
+        "library": "all",
+        "instructions": "The small round emblem in the top-left of the navigation bar."
+      },
+      {
+        "key": "field_alex_hero_establish",
+        "label": "Hero Frame 1: Establishing Shot",
+        "name": "hero_frame_establish",
+        "type": "image",
+        "return_format": "url",
+        "preview_size": "medium",
+        "library": "all",
+        "instructions": "The opening shot, Alexander overlooking the Himalayas at dusk. Use the highest resolution version available, this fills the full screen."
+      },
+      {
+        "key": "field_alex_hero_conquest",
+        "label": "Hero Frame 2: Conquest Scene",
+        "name": "hero_frame_conquest",
+        "type": "image",
+        "return_format": "url",
+        "preview_size": "medium",
+        "library": "all",
+        "instructions": "The battle charge scene that crossfades in as the visitor scrolls. Replace with an extracted AI video frame later if you move to the full motion version."
+      }
+    ],
+    "location": [
+      [
+        {
+          "param": "page",
+          "operator": "==",
+          "value": "REPLACE_WITH_HOMEPAGE_PAGE_ID"
+        }
+      ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "active": true,
+    "description": "Editable hero imagery for the Alexander's homepage cinematic section."
+  }
+]
