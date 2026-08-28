@@ -24,15 +24,15 @@
     Alexander's
   </a>
   <div class="site-nav__links">
-    <a href="#top">Home</a>
-    <a href="#story">Our Story</a>
-    <a href="#products">Products</a>
-    <a href="#certifications">Certifications</a>
-    <a href="#contact">Contact</a>
+    <a href="index.html">Home</a>
+    <a href="about.html">Our Story</a>
+    <a href="products.html">Products</a>
+    <a href="certifications.html">Certifications</a>
+    <a href="contact.html">Contact</a>
   </div>
   <div class="site-nav__cta">
     <span class="site-nav__phone">+92 300 5348542</span>
-    <a href="#contact" class="btn">Request A Quote</a>
+    <a href="contact.html" class="btn">Request A Quote</a>
     <button class="nav-toggle" aria-label="Open menu">&#9776;</button>
   </div>
 </nav>
@@ -50,14 +50,24 @@
     <div class="cinema__edge cinema__edge--left" id="edgeLeft"></div>
     <div class="cinema__edge cinema__edge--right" id="edgeRight"></div>
 
-    <!-- frame 1: establishing shot -->
+    <!-- beat 1: establishing shot, slow zoom-in -->
     <div class="cinema__frame" id="frameEstablish" style="opacity:1;">
       <img src="assets/images/hero-establishing.jpeg" alt="Alexander on horseback overlooking the Himalayan mountain range at dusk">
     </div>
 
-    <!-- frame 2: conquest montage -->
-    <div class="cinema__frame" id="frameConquest">
+    <!-- beat 2: conquest, wide, pans left to right with the charge -->
+    <div class="cinema__frame" id="frameConquestWide">
       <img src="assets/images/hero-conquest.jpeg" alt="Alexander charging through a conquered fortress gate">
+    </div>
+
+    <!-- beat 3: conquest, tight on Alexander, pans top to bottom -->
+    <div class="cinema__frame" id="frameConquestClose">
+      <img src="assets/images/hero-conquest-closeup.jpeg" alt="Close on Alexander raising his sword mid-charge">
+    </div>
+
+    <!-- beat 4: return to the Himalayas, warm graded, pans bottom to top -->
+    <div class="cinema__frame" id="frameReturn">
+      <img src="assets/images/hero-establishing.jpeg" alt="Returning to the Himalayan ridge at dusk">
     </div>
 
     <div class="cinema__scrim"></div>
@@ -65,9 +75,11 @@
 
     <!-- opening headline, fades out as scrub begins -->
     <div class="cinema__intro" id="cinemaIntro">
-      <span class="eyebrow" data-acf="hero_eyebrow">326 BC &middot; KHEWRA, THE HIMALAYAS</span>
-      <h1 data-acf="hero_headline">The Salt That <span class="accent">Conquered</span> Time</h1>
-      <p data-acf="hero_subcopy">A warhorse once knelt on this ridge and licked a rock that glowed pink beneath the dusk. Two thousand years later, we are still its guardians.</p>
+      <div class="text-plate">
+        <span class="eyebrow" data-acf="hero_eyebrow">326 BC &middot; KHEWRA, THE HIMALAYAS</span>
+        <h1 data-acf="hero_headline">The Salt That <span class="accent">Conquered</span> Time</h1>
+        <p data-acf="hero_subcopy">A warhorse once knelt on this ridge and licked a rock that glowed pink beneath the dusk. Two thousand years later, we are still its guardians.</p>
+      </div>
     </div>
 
     <div class="cinema__scrollcue" id="scrollCue">
@@ -96,6 +108,10 @@
 
     <!-- final discovery reveal -->
     <div class="cinema__discovery" id="cinemaDiscovery">
+      <div class="badge">
+        <img src="assets/images/mascot-front-crop.jpeg" alt="Alexander's emblem">
+        <span>Guardian Since 326 BC</span>
+      </div>
       <span class="eyebrow" data-acf="discovery_eyebrow">326 BC &middot; KHEWRA</span>
       <h2 data-acf="discovery_headline">The Discovery</h2>
       <p data-acf="discovery_subcopy">A horse knelt to drink, licked the stone beneath it, and revealed a reserve of pink salt formed over millions of years. Alexander's has been its guardian ever since.</p>
@@ -180,7 +196,7 @@
         <span class="eyebrow">The Collection</span>
         <h2 class="section-title" style="margin-top:14px;">Eight Categories.<br>One <span class="accent">Reserve</span>.</h2>
       </div>
-      <a href="#contact" class="btn">Request A Quote</a>
+      <a href="contact.html" class="btn">Request A Quote</a>
     </div>
     <div class="products__grid">
       <div class="product-card"><div class="product-card__tag">Culinary</div><h3>Fine Grain Salt</h3></div>
@@ -222,8 +238,8 @@
     <h2 class="section-title" style="margin-top:14px;">Ready To Stock The World's Finest <span class="accent">Pink Salt</span>?</h2>
     <p>Low minimum order quantities, FCL and LCL container logistics, and dedicated support for retailers and importers across the US and Europe.</p>
     <div class="cta-band__actions">
-      <a href="#contact" class="btn btn--ember">Request A Quote</a>
-      <a href="#certifications" class="btn">View Certifications</a>
+      <a href="contact.html" class="btn btn--ember">Request A Quote</a>
+      <a href="certifications.html" class="btn">View Certifications</a>
     </div>
   </div>
 </section>
@@ -240,10 +256,10 @@
     <div>
       <div class="footer__heading">Navigate</div>
       <div class="footer__links">
-        <a href="#top">Home</a>
-        <a href="#story">Our Story</a>
-        <a href="#products">Products</a>
-        <a href="#certifications">Certifications</a>
+        <a href="index.html">Home</a>
+        <a href="about.html">Our Story</a>
+        <a href="products.html">Products</a>
+        <a href="certifications.html">Certifications</a>
       </div>
     </div>
     <div>

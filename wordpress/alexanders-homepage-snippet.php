@@ -24,20 +24,34 @@
  * 7. TO SWAP IN BETTER QUALITY IMAGES LATER: open the Home page in
  *    WordPress, scroll down to the "Homepage Media" box added by ACF,
  *    click each image field, upload the new file, click Update. No
- *    code changes, no re-pasting this snippet.
+ *    code changes, no re-pasting this snippet. The hero currently has
+ *    4 beats (establish, conquest wide, conquest close, return), each
+ *    with its own field except "return" which reuses the establish
+ *    image on purpose. Add more beats later by adding another
+ *    .cinema__frame in the markup below plus one row in the "frames"
+ *    array inside the <script>, no other engine change needed.
+ * 8. IMPORTANT: this markup links to about.html, products.html,
+ *    certifications.html, contact.html directly. Once those exist
+ *    as real WordPress pages, either name their slugs to match
+ *    (Settings > Permalinks, page slug = "about", "products", etc.)
+ *    or replace these hrefs with the real page URLs from wp-admin.
  */
 
 if (!defined('ALEXANDERS_FALLBACK_BASE')) {
     define('ALEXANDERS_FALLBACK_BASE', 'https://alexanderssalt.com/wp-content/uploads/alexanders-assets/images/');
 }
 
-$nav_logo        = function_exists('get_field') ? get_field('nav_logo') : '';
-$hero_establish  = function_exists('get_field') ? get_field('hero_frame_establish') : '';
-$hero_conquest   = function_exists('get_field') ? get_field('hero_frame_conquest') : '';
+$nav_logo            = function_exists('get_field') ? get_field('nav_logo') : '';
+$hero_establish       = function_exists('get_field') ? get_field('hero_frame_establish') : '';
+$hero_conquest        = function_exists('get_field') ? get_field('hero_frame_conquest') : '';
+$hero_conquest_close  = function_exists('get_field') ? get_field('hero_frame_conquest_close') : '';
 
-if (empty($nav_logo))       { $nav_logo       = ALEXANDERS_FALLBACK_BASE . 'mascot-turnaround.jpeg'; }
-if (empty($hero_establish)) { $hero_establish = ALEXANDERS_FALLBACK_BASE . 'hero-establishing.jpeg'; }
-if (empty($hero_conquest))  { $hero_conquest  = ALEXANDERS_FALLBACK_BASE . 'hero-conquest.jpeg'; }
+if (empty($nav_logo))           { $nav_logo           = ALEXANDERS_FALLBACK_BASE . 'mascot-turnaround.jpeg'; }
+if (empty($hero_establish))     { $hero_establish     = ALEXANDERS_FALLBACK_BASE . 'hero-establishing.jpeg'; }
+if (empty($hero_conquest))      { $hero_conquest      = ALEXANDERS_FALLBACK_BASE . 'hero-conquest.jpeg'; }
+if (empty($hero_conquest_close)){ $hero_conquest_close= ALEXANDERS_FALLBACK_BASE . 'hero-conquest-closeup.jpeg'; }
+
+$mascot_badge = ALEXANDERS_FALLBACK_BASE . 'mascot-front-crop.jpeg';
 ?>
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -196,7 +210,7 @@ a { color: inherit; text-decoration: none; }
    ============================================================ */
 .cinema {
   position: relative;
-  height: 600vh; /* scroll distance that drives the scrub, tune freely */
+  height: 800vh; /* scroll distance that drives the scrub, tune freely */
 }
 
 .cinema__stage {
@@ -241,29 +255,44 @@ a { color: inherit; text-decoration: none; }
   will-change: opacity;
 }
 
+/* text plate: a real backdrop behind cinema text so it reads over any
+   image, bright or dark, rather than relying on the page-wide scrim */
+.text-plate {
+  display: inline-block;
+  max-width: 720px;
+  padding: 36px clamp(24px, 5vw, 56px);
+  background: rgba(9, 6, 13, 0.62);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  border: 1px solid rgba(201, 161, 90, 0.28);
+  border-radius: 4px;
+}
+
 /* opening text */
 .cinema__intro {
   position: absolute;
   left: 0; right: 0;
-  bottom: 14vh;
+  bottom: 12vh;
   text-align: center;
   padding: 0 var(--edge);
   will-change: opacity, transform;
 }
-.cinema__intro .eyebrow { display: block; margin-bottom: 18px; }
+.cinema__intro .eyebrow { display: block; margin-bottom: 20px; }
 .cinema__intro h1 {
   font-family: var(--font-display);
+  font-weight: 900;
   text-transform: uppercase;
-  font-size: clamp(32px, 6vw, 76px);
-  line-height: 1.05;
+  font-size: clamp(34px, 6.4vw, 82px);
+  line-height: 1.02;
+  letter-spacing: -0.01em;
   color: var(--parchment);
-  text-shadow: 0 4px 30px rgba(0,0,0,0.4);
 }
 .cinema__intro p {
-  max-width: 560px;
-  margin: 20px auto 0;
+  max-width: 520px;
+  margin: 22px auto 0;
   color: var(--parchment-dim);
   font-size: 15px;
+  font-weight: 500;
 }
 
 .cinema__scrollcue {
@@ -333,21 +362,42 @@ a { color: inherit; text-decoration: none; }
   text-align: center;
   opacity: 0;
   pointer-events: none;
+  padding: 0 20px;
 }
-.cinema__discovery .eyebrow { margin-bottom: 20px; }
+.cinema__discovery .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+  padding: 6px 14px 6px 6px;
+  border: 1px solid rgba(201,161,90,0.4);
+  border-radius: 999px;
+  background: rgba(9,6,13,0.5);
+}
+.cinema__discovery .badge img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; object-position: top; }
+.cinema__discovery .badge span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--parchment-dim);
+}
+.cinema__discovery .eyebrow { display: block; margin-bottom: 18px; }
 .cinema__discovery h2 {
   font-family: var(--font-display);
+  font-weight: 900;
   text-transform: uppercase;
-  font-size: clamp(36px, 8vw, 100px);
-  line-height: 1;
+  font-size: clamp(40px, 9vw, 108px);
+  line-height: 0.98;
+  letter-spacing: -0.01em;
   color: var(--parchment);
 }
 .cinema__discovery p {
-  margin-top: 22px;
-  max-width: 520px;
+  margin-top: 24px;
+  max-width: 480px;
   color: var(--parchment-dim);
   font-size: 15px;
-  padding: 0 20px;
+  font-weight: 500;
 }
 
 /* decorative side borders ("tweed") during the cinematic section */
@@ -548,6 +598,143 @@ a { color: inherit; text-decoration: none; }
 .cta-band__actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
 
 /* ============================================================
+   INNER PAGE HERO (About, Products, Certifications, Contact)
+   ============================================================ */
+.page-hero {
+  padding: 180px 0 80px;
+  background: linear-gradient(180deg, var(--stone-2), var(--void) 85%);
+  border-bottom: 1px solid rgba(201,161,90,0.15);
+}
+.page-hero p { max-width: 620px; margin-top: 18px; color: var(--parchment-dim); }
+
+/* ============================================================
+   VALUES GRID (About)
+   ============================================================ */
+.values { padding: 100px 0; background: var(--void); }
+.values__grid {
+  margin-top: 48px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1px;
+  background: rgba(201,161,90,0.15);
+}
+.value-card { background: var(--void); padding: 30px 22px; }
+.value-card .num { font-family: var(--font-mono); font-size: 12px; color: var(--bronze); }
+.value-card h3 { margin-top: 16px; font-family: var(--font-display); text-transform: uppercase; font-size: 15px; }
+.value-card p { margin-top: 10px; font-size: 13px; color: var(--parchment-dim); }
+@media (max-width: 900px) { .values__grid { grid-template-columns: repeat(2, 1fr); } }
+
+/* ============================================================
+   STORY TIMELINE (About)
+   ============================================================ */
+.timeline { padding: 0 0 100px; background: var(--void); }
+.timeline__row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 28px;
+  padding: 28px 0;
+  border-top: 1px solid rgba(201,161,90,0.15);
+}
+.timeline__row:last-child { border-bottom: 1px solid rgba(201,161,90,0.15); }
+.timeline__year { font-family: var(--font-mono); color: var(--ember); font-size: 14px; }
+.timeline__row h3 { font-family: var(--font-display); text-transform: uppercase; font-size: 16px; margin-bottom: 8px; }
+.timeline__row p { color: var(--parchment-dim); font-size: 14px; max-width: 640px; }
+
+/* ============================================================
+   PRODUCT FILTERS (Products page)
+   ============================================================ */
+.filter-bar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 40px; }
+.filter-btn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 10px 16px;
+  border: 1px solid rgba(201,161,90,0.35);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--parchment-dim);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.filter-btn:hover { border-color: var(--bronze); color: var(--parchment); }
+.filter-btn.is-active { border-color: var(--bronze); background: rgba(201,161,90,0.14); color: var(--parchment); }
+.product-card.is-hidden { display: none; }
+
+/* ============================================================
+   CERTIFICATIONS PAGE
+   ============================================================ */
+.cert-page-grid {
+  margin-top: 48px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+.cert-card {
+  border: 1px solid rgba(201,161,90,0.25);
+  border-radius: 3px;
+  padding: 28px;
+  background: var(--stone-2);
+}
+.cert-card__label { font-family: var(--font-mono); font-size: 11px; color: var(--bronze); text-transform: uppercase; letter-spacing: 0.08em; }
+.cert-card h3 { margin-top: 12px; font-family: var(--font-display); text-transform: uppercase; font-size: 17px; }
+.cert-card p { margin-top: 10px; font-size: 13.5px; color: var(--parchment-dim); }
+.cert-card .btn { margin-top: 20px; }
+@media (max-width: 900px) { .cert-page-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 560px) { .cert-page-grid { grid-template-columns: 1fr; } }
+
+/* ============================================================
+   CONTACT PAGE
+   ============================================================ */
+.contact-section { padding: 0 0 120px; background: var(--void); }
+.contact-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 60px;
+}
+.contact-info__item { padding: 22px 0; border-top: 1px solid rgba(201,161,90,0.15); }
+.contact-info__item:last-child { border-bottom: 1px solid rgba(201,161,90,0.15); }
+.contact-info__label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--bronze); }
+.contact-info__value { margin-top: 8px; font-size: 15px; }
+
+.form-field { margin-bottom: 20px; }
+.form-field label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--parchment-dim);
+  margin-bottom: 8px;
+}
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  background: var(--stone-2);
+  border: 1px solid rgba(201,161,90,0.3);
+  border-radius: 3px;
+  padding: 13px 14px;
+  color: var(--parchment);
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: var(--bronze);
+}
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.form-status { margin-top: 16px; font-family: var(--font-mono); font-size: 12px; }
+.form-status.is-success { color: var(--salt-pink); }
+.form-status.is-error { color: var(--clay); }
+@media (max-width: 800px) {
+  .contact-grid { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
    FOOTER
    ============================================================ */
 .site-footer {
@@ -600,45 +787,72 @@ a { color: inherit; text-decoration: none; }
 
 </style>
 
+
+<!-- ============================================================
+     NAV
+     ============================================================ -->
 <nav class="site-nav" id="siteNav">
   <a href="#top" class="site-nav__brand">
     <img src="<?php echo esc_url($nav_logo); ?>" alt="Alexander's emblem">
     Alexander's
   </a>
   <div class="site-nav__links">
-    <a href="#top">Home</a>
-    <a href="#story">Our Story</a>
-    <a href="#products">Products</a>
-    <a href="#certifications">Certifications</a>
-    <a href="#contact">Contact</a>
+    <a href="index.html">Home</a>
+    <a href="about.html">Our Story</a>
+    <a href="products.html">Products</a>
+    <a href="certifications.html">Certifications</a>
+    <a href="contact.html">Contact</a>
   </div>
   <div class="site-nav__cta">
     <span class="site-nav__phone">+92 300 5348542</span>
-    <a href="#contact" class="btn">Request A Quote</a>
+    <a href="contact.html" class="btn">Request A Quote</a>
     <button class="nav-toggle" aria-label="Open menu">&#9776;</button>
   </div>
 </nav>
 
+<!-- ============================================================
+     CINEMATIC SCROLL-SCRUB HERO
+     data-acf hooks mark the text a future ACF field group should
+     expose in wp-admin, wire these once the WordPress side is set up.
+     ============================================================ -->
 <a id="top"></a>
 <section class="cinema" id="cinema" aria-label="Alexander's origin story, scroll to progress">
+
   <div class="cinema__stage">
+
     <div class="cinema__edge cinema__edge--left" id="edgeLeft"></div>
     <div class="cinema__edge cinema__edge--right" id="edgeRight"></div>
 
+    <!-- beat 1: establishing shot, slow zoom-in -->
     <div class="cinema__frame" id="frameEstablish" style="opacity:1;">
       <img src="<?php echo esc_url($hero_establish); ?>" alt="Alexander on horseback overlooking the Himalayan mountain range at dusk">
     </div>
-    <div class="cinema__frame" id="frameConquest">
+
+    <!-- beat 2: conquest, wide, pans left to right with the charge -->
+    <div class="cinema__frame" id="frameConquestWide">
       <img src="<?php echo esc_url($hero_conquest); ?>" alt="Alexander charging through a conquered fortress gate">
+    </div>
+
+    <!-- beat 3: conquest, tight on Alexander, pans top to bottom -->
+    <div class="cinema__frame" id="frameConquestClose">
+      <img src="<?php echo esc_url($hero_conquest_close); ?>" alt="Close on Alexander raising his sword mid-charge">
+    </div>
+
+    <!-- beat 4: return to the Himalayas, warm graded, pans bottom to top -->
+    <div class="cinema__frame" id="frameReturn">
+      <img src="<?php echo esc_url($hero_establish); ?>" alt="Returning to the Himalayan ridge at dusk">
     </div>
 
     <div class="cinema__scrim"></div>
     <div class="cinema__colorgrade" id="colorgrade"></div>
 
+    <!-- opening headline, fades out as scrub begins -->
     <div class="cinema__intro" id="cinemaIntro">
-      <span class="eyebrow">326 BC &middot; KHEWRA, THE HIMALAYAS</span>
-      <h1>The Salt That <span class="accent">Conquered</span> Time</h1>
-      <p>A warhorse once knelt on this ridge and licked a rock that glowed pink beneath the dusk. Two thousand years later, we are still its guardians.</p>
+      <div class="text-plate">
+        <span class="eyebrow" data-acf="hero_eyebrow">326 BC &middot; KHEWRA, THE HIMALAYAS</span>
+        <h1 data-acf="hero_headline">The Salt That <span class="accent">Conquered</span> Time</h1>
+        <p data-acf="hero_subcopy">A warhorse once knelt on this ridge and licked a rock that glowed pink beneath the dusk. Two thousand years later, we are still its guardians.</p>
+      </div>
     </div>
 
     <div class="cinema__scrollcue" id="scrollCue">
@@ -646,6 +860,7 @@ a { color: inherit; text-decoration: none; }
       <span class="line"></span>
     </div>
 
+    <!-- region callouts, fired by scroll progress -->
     <div class="cinema__callouts">
       <div class="callout callout--macedon" id="calloutMacedon">
         <div class="callout__year">334 BC</div>
@@ -664,11 +879,17 @@ a { color: inherit; text-decoration: none; }
       </div>
     </div>
 
+    <!-- final discovery reveal -->
     <div class="cinema__discovery" id="cinemaDiscovery">
-      <span class="eyebrow">326 BC &middot; KHEWRA</span>
-      <h2>The Discovery</h2>
-      <p>A horse knelt to drink, licked the stone beneath it, and revealed a reserve of pink salt formed over millions of years. Alexander's has been its guardian ever since.</p>
+      <div class="badge">
+        <img src="<?php echo esc_url($mascot_badge); ?>" alt="Alexander's emblem">
+        <span>Guardian Since 326 BC</span>
+      </div>
+      <span class="eyebrow" data-acf="discovery_eyebrow">326 BC &middot; KHEWRA</span>
+      <h2 data-acf="discovery_headline">The Discovery</h2>
+      <p data-acf="discovery_subcopy">A horse knelt to drink, licked the stone beneath it, and revealed a reserve of pink salt formed over millions of years. Alexander's has been its guardian ever since.</p>
     </div>
+
   </div>
 </section>
 
@@ -679,15 +900,33 @@ a { color: inherit; text-decoration: none; }
   </div>
 </noscript>
 
+<!-- ============================================================
+     STATS
+     ============================================================ -->
 <section class="stats">
   <div class="wrap stats__grid">
-    <div class="stat"><div class="stat__num">500+</div><div class="stat__label">Tons Exported Monthly</div></div>
-    <div class="stat"><div class="stat__num">100%</div><div class="stat__label">Additive-Free &amp; Halal Certified</div></div>
-    <div class="stat"><div class="stat__num">84+</div><div class="stat__label">Trace Minerals Preserved</div></div>
-    <div class="stat"><div class="stat__num">2,000+</div><div class="stat__label">Years Since Discovery</div></div>
+    <div class="stat">
+      <div class="stat__num">500+</div>
+      <div class="stat__label">Tons Exported Monthly</div>
+    </div>
+    <div class="stat">
+      <div class="stat__num">100%</div>
+      <div class="stat__label">Additive-Free &amp; Halal Certified</div>
+    </div>
+    <div class="stat">
+      <div class="stat__num">84+</div>
+      <div class="stat__label">Trace Minerals Preserved</div>
+    </div>
+    <div class="stat">
+      <div class="stat__num">2,000+</div>
+      <div class="stat__label">Years Since Discovery</div>
+    </div>
   </div>
 </section>
 
+<!-- ============================================================
+     PROCESS
+     ============================================================ -->
 <section class="process" id="story">
   <div class="wrap">
     <div class="process__head">
@@ -696,14 +935,33 @@ a { color: inherit; text-decoration: none; }
       <p>Most commercial salt is blasted with explosives, bleached, then cut with anti-caking agents. We do not. Every crystal that leaves Khewra passes through four stages, and not one of them touches a chemical.</p>
     </div>
     <div class="process__grid">
-      <div class="process__step"><div class="num">01</div><h3>Ethical Extraction</h3><p>Hand-mined by skilled workers at fair wages, no explosives, no mechanized blasting.</p></div>
-      <div class="process__step"><div class="num">02</div><h3>The Purification Wash</h3><p>Rinsed in natural spring water to clear surface sediment before any processing begins.</p></div>
-      <div class="process__step"><div class="num">03</div><h3>Precision Crafting</h3><p>Ground to exact specification, from micro-fine powder to coarse culinary crystals.</p></div>
-      <div class="process__step"><div class="num">04</div><h3>The Purity Seal</h3><p>Optical color sorting, metal detection, then a hermetic seal before it ever leaves the facility.</p></div>
+      <div class="process__step">
+        <div class="num">01</div>
+        <h3>Ethical Extraction</h3>
+        <p>Hand-mined by skilled workers at fair wages, no explosives, no mechanized blasting.</p>
+      </div>
+      <div class="process__step">
+        <div class="num">02</div>
+        <h3>The Purification Wash</h3>
+        <p>Rinsed in natural spring water to clear surface sediment before any processing begins.</p>
+      </div>
+      <div class="process__step">
+        <div class="num">03</div>
+        <h3>Precision Crafting</h3>
+        <p>Ground to exact specification, from micro-fine powder to coarse culinary crystals.</p>
+      </div>
+      <div class="process__step">
+        <div class="num">04</div>
+        <h3>The Purity Seal</h3>
+        <p>Optical color sorting, metal detection, then a hermetic seal before it ever leaves the facility.</p>
+      </div>
     </div>
   </div>
 </section>
 
+<!-- ============================================================
+     PRODUCTS
+     ============================================================ -->
 <section class="products" id="products">
   <div class="wrap">
     <div class="products__head">
@@ -711,7 +969,7 @@ a { color: inherit; text-decoration: none; }
         <span class="eyebrow">The Collection</span>
         <h2 class="section-title" style="margin-top:14px;">Eight Categories.<br>One <span class="accent">Reserve</span>.</h2>
       </div>
-      <a href="#contact" class="btn">Request A Quote</a>
+      <a href="contact.html" class="btn">Request A Quote</a>
     </div>
     <div class="products__grid">
       <div class="product-card"><div class="product-card__tag">Culinary</div><h3>Fine Grain Salt</h3></div>
@@ -726,6 +984,9 @@ a { color: inherit; text-decoration: none; }
   </div>
 </section>
 
+<!-- ============================================================
+     CERTIFICATIONS
+     ============================================================ -->
 <section class="certs" id="certifications">
   <div class="wrap">
     <span class="eyebrow">Trust, Verified</span>
@@ -741,18 +1002,24 @@ a { color: inherit; text-decoration: none; }
   </div>
 </section>
 
+<!-- ============================================================
+     CTA BAND
+     ============================================================ -->
 <section class="cta-band">
   <div class="wrap">
     <span class="eyebrow">Wholesale &amp; Bulk Export</span>
     <h2 class="section-title" style="margin-top:14px;">Ready To Stock The World's Finest <span class="accent">Pink Salt</span>?</h2>
     <p>Low minimum order quantities, FCL and LCL container logistics, and dedicated support for retailers and importers across the US and Europe.</p>
     <div class="cta-band__actions">
-      <a href="#contact" class="btn btn--ember">Request A Quote</a>
-      <a href="#certifications" class="btn">View Certifications</a>
+      <a href="contact.html" class="btn btn--ember">Request A Quote</a>
+      <a href="certifications.html" class="btn">View Certifications</a>
     </div>
   </div>
 </section>
 
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
 <footer class="site-footer" id="contact">
   <div class="wrap footer__grid">
     <div>
@@ -762,10 +1029,10 @@ a { color: inherit; text-decoration: none; }
     <div>
       <div class="footer__heading">Navigate</div>
       <div class="footer__links">
-        <a href="#top">Home</a>
-        <a href="#story">Our Story</a>
-        <a href="#products">Products</a>
-        <a href="#certifications">Certifications</a>
+        <a href="index.html">Home</a>
+        <a href="about.html">Our Story</a>
+        <a href="products.html">Products</a>
+        <a href="certifications.html">Certifications</a>
       </div>
     </div>
     <div>
@@ -782,6 +1049,7 @@ a { color: inherit; text-decoration: none; }
     <span>Khewra Salt Mines, Pakistan</span>
   </div>
 </footer>
+
 
 <script>
 /* ============================================================
@@ -801,8 +1069,6 @@ a { color: inherit; text-decoration: none; }
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var cinema = document.getElementById('cinema');
-  var frameEstablish = document.getElementById('frameEstablish');
-  var frameConquest = document.getElementById('frameConquest');
   var colorgrade = document.getElementById('colorgrade');
   var intro = document.getElementById('cinemaIntro');
   var scrollCue = document.getElementById('scrollCue');
@@ -811,15 +1077,7 @@ a { color: inherit; text-decoration: none; }
   var edgeRight = document.getElementById('edgeRight');
   var nav = document.getElementById('siteNav');
 
-  var callouts = {
-    macedon: { el: document.getElementById('calloutMacedon'), inAt: 0.30, outAt: 0.42 },
-    persia: { el: document.getElementById('calloutPersia'), inAt: 0.44, outAt: 0.56 },
-    bactria: { el: document.getElementById('calloutBactria'), inAt: 0.58, outAt: 0.70 }
-  };
-
   if (!cinema) return;
-
-  var mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
 
   function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
 
@@ -830,6 +1088,31 @@ a { color: inherit; text-decoration: none; }
     return (progress - a) / (b - a);
   }
 
+  /* ----------------------------------------------------------
+     Frame sequence. Each entry is one visual beat, on screen
+     between "in" and "out", crossfading at the edges. "pan"
+     is the direction its Ken Burns drift travels while it is
+     the dominant frame, so consecutive beats don't all move
+     the same way. To add a real 5th/6th/7th beat later once
+     the AI-generated frames exist: add another <div class=
+     "cinema__frame"> in index.html with its own id, add one
+     row here, nothing else in this engine changes.
+     ---------------------------------------------------------- */
+  var frames = [
+    { el: document.getElementById('frameEstablish'), in: 0.00, out: 0.22, pan: 'zoom-in' },
+    { el: document.getElementById('frameConquestWide'), in: 0.20, out: 0.40, pan: 'left-right' },
+    { el: document.getElementById('frameConquestClose'), in: 0.38, out: 0.60, pan: 'top-bottom' },
+    { el: document.getElementById('frameReturn'), in: 0.58, out: 1.00, pan: 'bottom-top-out' }
+  ].filter(function (f) { return f.el; });
+
+  var callouts = {
+    macedon: { el: document.getElementById('calloutMacedon'), inAt: 0.22, outAt: 0.34 },
+    persia: { el: document.getElementById('calloutPersia'), inAt: 0.34, outAt: 0.46 },
+    bactria: { el: document.getElementById('calloutBactria'), inAt: 0.46, outAt: 0.58 }
+  };
+
+  var mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
+
   function getProgress() {
     var rect = cinema.getBoundingClientRect();
     var total = cinema.offsetHeight - window.innerHeight;
@@ -839,11 +1122,21 @@ a { color: inherit; text-decoration: none; }
   }
 
   function setCalloutState(c, p) {
-    var inRamp = band(p, c.inAt, c.inAt + 0.04);
-    var outRamp = 1 - band(p, c.outAt - 0.04, c.outAt);
+    var inRamp = band(p, c.inAt, c.inAt + 0.035);
+    var outRamp = 1 - band(p, c.outAt - 0.035, c.outAt);
     var visibility = Math.min(inRamp, outRamp);
     c.el.style.opacity = visibility;
     c.el.style.transform = 'translateY(' + (24 - 24 * visibility) + 'px) scale(' + (0.96 + 0.04 * visibility) + ')';
+  }
+
+  function applyPan(img, pan, t) {
+    if (reducedMotion) return;
+    var tx = 0, ty = 0, scale = 1.05;
+    if (pan === 'zoom-in') { scale = 1.02 + t * 0.10; }
+    else if (pan === 'left-right') { tx = -3 + t * 6; scale = 1.06; }
+    else if (pan === 'top-bottom') { ty = -3 + t * 6; scale = 1.10; }
+    else if (pan === 'bottom-top-out') { ty = 3 - t * 6; scale = 1.10 - t * 0.08; }
+    img.style.transform = 'translate(' + tx + '%, ' + ty + '%) scale(' + scale + ')';
   }
 
   function update() {
@@ -854,29 +1147,24 @@ a { color: inherit; text-decoration: none; }
     else nav.classList.remove('is-solid');
 
     // intro copy and scroll cue fade out quickly
-    var introVisible = 1 - band(p, 0.02, 0.12);
+    var introVisible = 1 - band(p, 0.015, 0.09);
     intro.style.opacity = introVisible;
     intro.style.transform = 'translateY(' + (1 - introVisible) * -20 + 'px)';
-    scrollCue.style.opacity = 1 - band(p, 0.01, 0.08);
+    scrollCue.style.opacity = 1 - band(p, 0.01, 0.06);
 
-    // establish -> conquest crossfade, then conquest -> establish return
-    var toConquest = band(p, 0.16, 0.32);
-    var backToEstablish = band(p, 0.72, 0.86);
-    var establishOpacity = (1 - toConquest) + backToEstablish * toConquest;
-    var conquestOpacity = toConquest * (1 - backToEstablish);
+    // crossfade + independent pan for every frame in the sequence
+    frames.forEach(function (f) {
+      var fadeIn = band(p, f.in, f.in + 0.05);
+      var fadeOut = 1 - band(p, f.out - 0.05, f.out);
+      var opacity = f.out >= 0.999 ? fadeIn : Math.min(fadeIn, fadeOut);
+      f.el.style.opacity = clamp(opacity, 0, 1);
 
-    frameEstablish.style.opacity = clamp(establishOpacity, 0, 1);
-    frameConquest.style.opacity = clamp(conquestOpacity, 0, 1);
-
-    // gentle Ken Burns push on whichever frame is dominant
-    if (!reducedMotion) {
-      var scale = 1.06 + p * 0.08;
-      frameEstablish.querySelector('img').style.transform = 'scale(' + scale + ')';
-      frameConquest.querySelector('img').style.transform = 'scale(' + (1.1 - p * 0.04) + ')';
-    }
+      var t = band(p, f.in, f.out);
+      applyPan(f.el.querySelector('img'), f.pan, t);
+    });
 
     // warm color grade rises as the journey returns to Khewra
-    colorgrade.style.opacity = band(p, 0.66, 0.9) * 0.9;
+    colorgrade.style.opacity = band(p, 0.64, 0.88) * 0.9;
 
     // region callouts
     setCalloutState(callouts.macedon, p);
@@ -884,7 +1172,7 @@ a { color: inherit; text-decoration: none; }
     setCalloutState(callouts.bactria, p);
 
     // final discovery reveal
-    var discoveryVisible = band(p, 0.88, 1.0);
+    var discoveryVisible = band(p, 0.90, 1.0);
     discovery.style.opacity = discoveryVisible;
     discovery.style.pointerEvents = discoveryVisible > 0.5 ? 'auto' : 'none';
 
@@ -920,10 +1208,9 @@ a { color: inherit; text-decoration: none; }
       mouseY += (targetY - mouseY) * 0.05;
       var shiftX = mouseX * 14;
       var shiftY = mouseY * 10;
-      [frameEstablish, frameConquest].forEach(function (frame) {
-        var img = frame.querySelector('img');
-        img.style.marginLeft = shiftX + 'px';
-        img.style.marginTop = shiftY + 'px';
+      frames.forEach(function (f) {
+        f.el.querySelector('img').style.marginLeft = shiftX + 'px';
+        f.el.querySelector('img').style.marginTop = shiftY + 'px';
       });
       requestAnimationFrame(parallaxLoop);
     }
@@ -931,6 +1218,73 @@ a { color: inherit; text-decoration: none; }
   }
 
   update();
+})();
+
+/* ============================================================
+   PRODUCT FILTER (products.html and the homepage grid, both use
+   the same markup: .product-card[data-category] + .filter-btn)
+   ============================================================ */
+(function () {
+  var filterBar = document.getElementById('filterBar');
+  if (!filterBar) return;
+
+  var buttons = filterBar.querySelectorAll('.filter-btn');
+  var cards = document.querySelectorAll('.product-card');
+
+  filterBar.addEventListener('click', function (e) {
+    var btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+
+    buttons.forEach(function (b) { b.classList.remove('is-active'); });
+    btn.classList.add('is-active');
+
+    var filter = btn.getAttribute('data-filter');
+    cards.forEach(function (card) {
+      var match = filter === 'all' || card.getAttribute('data-category') === filter;
+      card.classList.toggle('is-hidden', !match);
+    });
+  });
+})();
+
+/* ============================================================
+   CONTACT FORM
+   Posts to WordPress admin-post.php (see wordpress/contact-form-
+   handler.php). If that endpoint isn't live yet (static preview,
+   or the WPCode snippet hasn't been installed), fails gracefully
+   to a mailto link so a visitor is never met with a dead form.
+   ============================================================ */
+(function () {
+  var form = document.getElementById('contactForm');
+  if (!form) return;
+
+  var status = document.getElementById('formStatus');
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    status.textContent = 'Sending...';
+    status.className = 'form-status';
+
+    var data = new FormData(form);
+
+    fetch(form.action, { method: 'POST', body: data, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+      .then(function (res) {
+        if (!res.ok) throw new Error('Request failed');
+        status.textContent = 'Message sent. Our export team will respond within one business day.';
+        status.className = 'form-status is-success';
+        form.reset();
+      })
+      .catch(function () {
+        var subject = encodeURIComponent('Wholesale Inquiry: ' + (data.get('scope') || 'General'));
+        var body = encodeURIComponent(
+          'Name: ' + data.get('name') + '\n' +
+          'Email: ' + data.get('email') + '\n' +
+          'Phone: ' + data.get('phone') + '\n\n' +
+          data.get('message')
+        );
+        status.innerHTML = 'The contact form isn\'t connected yet. <a href="mailto:support@alexandersalts.com?subject=' + subject + '&body=' + body + '" style="color:var(--salt-pink);text-decoration:underline;">Click here to send this by email instead</a>.';
+        status.className = 'form-status is-error';
+      });
+  });
 })();
 
 </script>

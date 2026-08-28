@@ -15,8 +15,6 @@
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var cinema = document.getElementById('cinema');
-  var frameEstablish = document.getElementById('frameEstablish');
-  var frameConquest = document.getElementById('frameConquest');
   var colorgrade = document.getElementById('colorgrade');
   var intro = document.getElementById('cinemaIntro');
   var scrollCue = document.getElementById('scrollCue');
@@ -25,15 +23,7 @@
   var edgeRight = document.getElementById('edgeRight');
   var nav = document.getElementById('siteNav');
 
-  var callouts = {
-    macedon: { el: document.getElementById('calloutMacedon'), inAt: 0.30, outAt: 0.42 },
-    persia: { el: document.getElementById('calloutPersia'), inAt: 0.44, outAt: 0.56 },
-    bactria: { el: document.getElementById('calloutBactria'), inAt: 0.58, outAt: 0.70 }
-  };
-
   if (!cinema) return;
-
-  var mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
 
   function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
 
@@ -44,6 +34,31 @@
     return (progress - a) / (b - a);
   }
 
+  /* ----------------------------------------------------------
+     Frame sequence. Each entry is one visual beat, on screen
+     between "in" and "out", crossfading at the edges. "pan"
+     is the direction its Ken Burns drift travels while it is
+     the dominant frame, so consecutive beats don't all move
+     the same way. To add a real 5th/6th/7th beat later once
+     the AI-generated frames exist: add another <div class=
+     "cinema__frame"> in index.html with its own id, add one
+     row here, nothing else in this engine changes.
+     ---------------------------------------------------------- */
+  var frames = [
+    { el: document.getElementById('frameEstablish'), in: 0.00, out: 0.22, pan: 'zoom-in' },
+    { el: document.getElementById('frameConquestWide'), in: 0.20, out: 0.40, pan: 'left-right' },
+    { el: document.getElementById('frameConquestClose'), in: 0.38, out: 0.60, pan: 'top-bottom' },
+    { el: document.getElementById('frameReturn'), in: 0.58, out: 1.00, pan: 'bottom-top-out' }
+  ].filter(function (f) { return f.el; });
+
+  var callouts = {
+    macedon: { el: document.getElementById('calloutMacedon'), inAt: 0.22, outAt: 0.34 },
+    persia: { el: document.getElementById('calloutPersia'), inAt: 0.34, outAt: 0.46 },
+    bactria: { el: document.getElementById('calloutBactria'), inAt: 0.46, outAt: 0.58 }
+  };
+
+  var mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
+
   function getProgress() {
     var rect = cinema.getBoundingClientRect();
     var total = cinema.offsetHeight - window.innerHeight;
@@ -53,11 +68,21 @@
   }
 
   function setCalloutState(c, p) {
-    var inRamp = band(p, c.inAt, c.inAt + 0.04);
-    var outRamp = 1 - band(p, c.outAt - 0.04, c.outAt);
+    var inRamp = band(p, c.inAt, c.inAt + 0.035);
+    var outRamp = 1 - band(p, c.outAt - 0.035, c.outAt);
     var visibility = Math.min(inRamp, outRamp);
     c.el.style.opacity = visibility;
     c.el.style.transform = 'translateY(' + (24 - 24 * visibility) + 'px) scale(' + (0.96 + 0.04 * visibility) + ')';
+  }
+
+  function applyPan(img, pan, t) {
+    if (reducedMotion) return;
+    var tx = 0, ty = 0, scale = 1.05;
+    if (pan === 'zoom-in') { scale = 1.02 + t * 0.10; }
+    else if (pan === 'left-right') { tx = -3 + t * 6; scale = 1.06; }
+    else if (pan === 'top-bottom') { ty = -3 + t * 6; scale = 1.10; }
+    else if (pan === 'bottom-top-out') { ty = 3 - t * 6; scale = 1.10 - t * 0.08; }
+    img.style.transform = 'translate(' + tx + '%, ' + ty + '%) scale(' + scale + ')';
   }
 
   function update() {
@@ -68,29 +93,24 @@
     else nav.classList.remove('is-solid');
 
     // intro copy and scroll cue fade out quickly
-    var introVisible = 1 - band(p, 0.02, 0.12);
+    var introVisible = 1 - band(p, 0.015, 0.09);
     intro.style.opacity = introVisible;
     intro.style.transform = 'translateY(' + (1 - introVisible) * -20 + 'px)';
-    scrollCue.style.opacity = 1 - band(p, 0.01, 0.08);
+    scrollCue.style.opacity = 1 - band(p, 0.01, 0.06);
 
-    // establish -> conquest crossfade, then conquest -> establish return
-    var toConquest = band(p, 0.16, 0.32);
-    var backToEstablish = band(p, 0.72, 0.86);
-    var establishOpacity = (1 - toConquest) + backToEstablish * toConquest;
-    var conquestOpacity = toConquest * (1 - backToEstablish);
+    // crossfade + independent pan for every frame in the sequence
+    frames.forEach(function (f) {
+      var fadeIn = band(p, f.in, f.in + 0.05);
+      var fadeOut = 1 - band(p, f.out - 0.05, f.out);
+      var opacity = f.out >= 0.999 ? fadeIn : Math.min(fadeIn, fadeOut);
+      f.el.style.opacity = clamp(opacity, 0, 1);
 
-    frameEstablish.style.opacity = clamp(establishOpacity, 0, 1);
-    frameConquest.style.opacity = clamp(conquestOpacity, 0, 1);
-
-    // gentle Ken Burns push on whichever frame is dominant
-    if (!reducedMotion) {
-      var scale = 1.06 + p * 0.08;
-      frameEstablish.querySelector('img').style.transform = 'scale(' + scale + ')';
-      frameConquest.querySelector('img').style.transform = 'scale(' + (1.1 - p * 0.04) + ')';
-    }
+      var t = band(p, f.in, f.out);
+      applyPan(f.el.querySelector('img'), f.pan, t);
+    });
 
     // warm color grade rises as the journey returns to Khewra
-    colorgrade.style.opacity = band(p, 0.66, 0.9) * 0.9;
+    colorgrade.style.opacity = band(p, 0.64, 0.88) * 0.9;
 
     // region callouts
     setCalloutState(callouts.macedon, p);
@@ -98,7 +118,7 @@
     setCalloutState(callouts.bactria, p);
 
     // final discovery reveal
-    var discoveryVisible = band(p, 0.88, 1.0);
+    var discoveryVisible = band(p, 0.90, 1.0);
     discovery.style.opacity = discoveryVisible;
     discovery.style.pointerEvents = discoveryVisible > 0.5 ? 'auto' : 'none';
 
@@ -134,10 +154,9 @@
       mouseY += (targetY - mouseY) * 0.05;
       var shiftX = mouseX * 14;
       var shiftY = mouseY * 10;
-      [frameEstablish, frameConquest].forEach(function (frame) {
-        var img = frame.querySelector('img');
-        img.style.marginLeft = shiftX + 'px';
-        img.style.marginTop = shiftY + 'px';
+      frames.forEach(function (f) {
+        f.el.querySelector('img').style.marginLeft = shiftX + 'px';
+        f.el.querySelector('img').style.marginTop = shiftY + 'px';
       });
       requestAnimationFrame(parallaxLoop);
     }

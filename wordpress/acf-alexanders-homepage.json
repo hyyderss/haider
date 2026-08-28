@@ -25,13 +25,23 @@
       },
       {
         "key": "field_alex_hero_conquest",
-        "label": "Hero Frame 2: Conquest Scene",
+        "label": "Hero Frame 2: Conquest Scene (Wide)",
         "name": "hero_frame_conquest",
         "type": "image",
         "return_format": "url",
         "preview_size": "medium",
         "library": "all",
-        "instructions": "The battle charge scene that crossfades in as the visitor scrolls. Replace with an extracted AI video frame later if you move to the full motion version."
+        "instructions": "The wide battle charge scene, pans left to right. Replace with an extracted AI video frame later if you move to the full motion version."
+      },
+      {
+        "key": "field_alex_hero_conquest_close",
+        "label": "Hero Frame 3: Conquest Scene (Close)",
+        "name": "hero_frame_conquest_close",
+        "type": "image",
+        "return_format": "url",
+        "preview_size": "medium",
+        "library": "all",
+        "instructions": "A tighter shot on Alexander mid-charge, pans top to bottom. Currently a crop of Frame 2, replace with its own distinct image once you have one."
       }
     ],
     "location": [
