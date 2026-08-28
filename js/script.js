@@ -146,3 +146,70 @@
 
   update();
 })();
+
+/* ============================================================
+   PRODUCT FILTER (products.html and the homepage grid, both use
+   the same markup: .product-card[data-category] + .filter-btn)
+   ============================================================ */
+(function () {
+  var filterBar = document.getElementById('filterBar');
+  if (!filterBar) return;
+
+  var buttons = filterBar.querySelectorAll('.filter-btn');
+  var cards = document.querySelectorAll('.product-card');
+
+  filterBar.addEventListener('click', function (e) {
+    var btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+
+    buttons.forEach(function (b) { b.classList.remove('is-active'); });
+    btn.classList.add('is-active');
+
+    var filter = btn.getAttribute('data-filter');
+    cards.forEach(function (card) {
+      var match = filter === 'all' || card.getAttribute('data-category') === filter;
+      card.classList.toggle('is-hidden', !match);
+    });
+  });
+})();
+
+/* ============================================================
+   CONTACT FORM
+   Posts to WordPress admin-post.php (see wordpress/contact-form-
+   handler.php). If that endpoint isn't live yet (static preview,
+   or the WPCode snippet hasn't been installed), fails gracefully
+   to a mailto link so a visitor is never met with a dead form.
+   ============================================================ */
+(function () {
+  var form = document.getElementById('contactForm');
+  if (!form) return;
+
+  var status = document.getElementById('formStatus');
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    status.textContent = 'Sending...';
+    status.className = 'form-status';
+
+    var data = new FormData(form);
+
+    fetch(form.action, { method: 'POST', body: data, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+      .then(function (res) {
+        if (!res.ok) throw new Error('Request failed');
+        status.textContent = 'Message sent. Our export team will respond within one business day.';
+        status.className = 'form-status is-success';
+        form.reset();
+      })
+      .catch(function () {
+        var subject = encodeURIComponent('Wholesale Inquiry: ' + (data.get('scope') || 'General'));
+        var body = encodeURIComponent(
+          'Name: ' + data.get('name') + '\n' +
+          'Email: ' + data.get('email') + '\n' +
+          'Phone: ' + data.get('phone') + '\n\n' +
+          data.get('message')
+        );
+        status.innerHTML = 'The contact form isn\'t connected yet. <a href="mailto:support@alexandersalts.com?subject=' + subject + '&body=' + body + '" style="color:var(--salt-pink);text-decoration:underline;">Click here to send this by email instead</a>.';
+        status.className = 'form-status is-error';
+      });
+  });
+})();
