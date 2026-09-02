@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pendulum Starter</title>
+  <style>
+    :root { color-scheme: light; font-family: Arial, sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f3f5f4; color: #17212b; }
+    main { width: min(760px, 100%); margin: 0 auto; padding: 24px; }
+    header { display: flex; justify-content: space-between; gap: 18px; align-items: end; margin-bottom: 14px; }
+    h1 { margin: 0; font: 600 28px Georgia, serif; }
+    p { margin: 6px 0 0; color: #5d6870; font-size: 13px; }
+    .readout { display: flex; gap: 14px; color: #173b56; font: 700 12px ui-monospace, monospace; }
+    canvas { display: block; width: 100%; height: auto; border: 1px solid #cfd5d2; background: #fff; }
+    .controls { display: flex; gap: 8px; margin-top: 12px; }
+    button { border: 1px solid #173b56; background: #173b56; color: white; cursor: pointer; padding: 9px 14px; font-weight: 700; }
+    button:nth-child(2), button:nth-child(3) { background: white; color: #173b56; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div><h1>Ideal pendulum</h1><p>input u(t) = 0 N·m · output θ(t) · state [θ, θ̇]</p></div>
+      <div class="readout"><span id="theta">θ = 0.75 rad</span><span id="omega">θ̇ = 0.00 rad/s</span></div>
+    </header>
+    <canvas id="scene" width="720" height="420" aria-label="Animated pendulum"></canvas>
+    <div class="controls">
+      <button id="start">Start</button>
+      <button id="pause">Pause</button>
+      <button id="reset">Reset</button>
+    </div>
+  </main>
+  <script>
+    const canvas = document.getElementById("scene");
+    const ctx = canvas.getContext("2d");
+    const thetaLabel = document.getElementById("theta");
+    const omegaLabel = document.getElementById("omega");
+    const g = 9.81;
+    const length = 1.0;
+    const mass = 1.0;
+    const damping = 0.08;
+    const fixedStep = 1 / 120;
+    let theta = 0.75;
+    let omega = 0;
+    let running = false;
+    let previousTime = 0;
+    let accumulatedTime = 0;
+
+    function resetState() {
+      theta = 0.75;
+      omega = 0;
+      running = false;
+      previousTime = 0;
+      accumulatedTime = 0;
+      draw();
+    }
+
+    function integrate(dt) {
+      const appliedTorque = 0;
+      const angularAcceleration = (appliedTorque - damping * omega - mass * g * length * Math.sin(theta)) / (mass * length * length);
+      omega += angularAcceleration * dt;
+      theta += omega * dt;
+    }
+
+    function draw() {
+      const pivotX = canvas.width / 2;
+      const pivotY = 78;
+      const rodLength = 235;
+      const bobX = pivotX + rodLength * Math.sin(theta);
+      const bobY = pivotY + rodLength * Math.cos(theta);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#f7f8f6";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = "#aab4b6";
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(pivotX - 80, pivotY - 12); ctx.lineTo(pivotX + 80, pivotY - 12); ctx.stroke();
+      ctx.strokeStyle = "#173b56";
+      ctx.lineWidth = 5;
+      ctx.beginPath(); ctx.moveTo(pivotX, pivotY); ctx.lineTo(bobX, bobY); ctx.stroke();
+      ctx.fillStyle = "#2b648c";
+      ctx.beginPath(); ctx.arc(bobX, bobY, 23, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#b99a45";
+      ctx.beginPath(); ctx.arc(pivotX, pivotY, 8, 0, Math.PI * 2); ctx.fill();
+      thetaLabel.textContent = "θ = " + theta.toFixed(2) + " rad";
+      omegaLabel.textContent = "θ̇ = " + omega.toFixed(2) + " rad/s";
+    }
+
+    function animate(time) {
+      if (!previousTime) previousTime = time;
+      if (running) {
+        const elapsed = Math.min((time - previousTime) / 1000, 0.05);
+        accumulatedTime = Math.min(accumulatedTime + elapsed, 0.1);
+        while (accumulatedTime >= fixedStep) {
+          integrate(fixedStep);
+          accumulatedTime -= fixedStep;
+        }
+      }
+      previousTime = time;
+      draw();
+      requestAnimationFrame(animate);
+    }
+
+    document.getElementById("start").addEventListener("click", () => { running = true; });
+    document.getElementById("pause").addEventListener("click", () => { running = false; });
+    document.getElementById("reset").addEventListener("click", resetState);
+    resetState();
+    requestAnimationFrame(animate);
+  </script>
+</body>
+</html>
